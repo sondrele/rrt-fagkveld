@@ -44,7 +44,7 @@ impl Add<Vec3> for Vec3 {
     type Output = Vec3;
 
     fn add(self, vec: Vec3) -> Vec3 {
-        Vec3::new(self.x + vec.x, self.y + vec.y, self.z + vec.z)
+        panic!("Step 1) Implement vector-vetor addition")
     }
 }
 
@@ -68,7 +68,7 @@ impl Mul<f64> for Vec3 {
     type Output = Vec3;
 
     fn mul(self, val: f64) -> Vec3 {
-        Vec3::new(self.x * val, self.y * val, self.z * val)
+        panic!("Step 1) Implement vector-scalar multiplication")
     }
 }
 
@@ -76,7 +76,7 @@ impl Mul<Vec3> for f64 {
     type Output = Vec3;
 
     fn mul(self, vec: Vec3) -> Vec3 {
-        vec * self
+        panic!("Step 1) Implement scalar-vector multiplication")
     }
 }
 

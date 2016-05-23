@@ -5,7 +5,9 @@ use ray::Ray;
 use color::Color;
 
 pub trait Intersectable : Debug {
-    fn intersects(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Intersection>;
+    fn intersects(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Intersection> {
+        None
+    }
 
     fn scatter(&self, _: &Ray, _: &Intersection) -> Option<(Color, Ray)> {
         None
@@ -13,20 +15,31 @@ pub trait Intersectable : Debug {
 }
 
 #[derive(Debug)]
-pub struct Intersection<'a> {
+pub struct Intersection {
     pub t: f64,
     pub point: Vec3,
-    pub normal: Vec3,
-    pub shape: &'a Intersectable,
+
+    // Step 3a) Add a surface normal to the intersection, remember to update the 'new'-function
+    // pub normal: Vec3,
+
+    // Step 4a) Add a reference to the shape that has been intersected
+    // pub shape: &'a Intersectable,
 }
 
-impl<'a> Intersection<'a> {
-    pub fn new(t: f64, point: Vec3, normal: Vec3, shape: &'a Intersectable) -> Intersection {
+impl Intersection {
+    pub fn new(t: f64, point: Vec3) -> Intersection {
         Intersection {
             t: t,
             point: point,
-            normal: normal,
-            shape: shape,
         }
     }
+
+    // pub fn new(t: f64, point: Vec3, normal: Vec3, shape: &'a Intersectable) -> Intersection<'a> {
+    //     Intersection {
+    //         t: t,
+    //         point: point,
+    //         normal: normal,
+    //         shape: shape,
+    //     }
+    // }
 }

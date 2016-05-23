@@ -70,10 +70,6 @@ impl Add<Color> for Color {
 
 impl Into<Pixel> for Color {
     fn into(self) -> Pixel {
-        Pixel {
-            r: (255.99 * self.r) as u8,
-            g: (255.99 * self.g) as u8,
-            b: (255.99 * self.b) as u8,
-        }
+        panic!("Step 1b) Return a Pixel. Remember to convert the f64 Color value [0, 1) to a u8 Pixel value [0, 255]")
     }
 }
