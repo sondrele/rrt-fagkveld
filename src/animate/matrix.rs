@@ -1,53 +1,50 @@
-use std::f64::consts::PI;
-
 #[derive(Clone, Copy)]
 pub enum Axis {
-    X, Y, Z
+    X,
+    Y,
+    Z,
 }
 
 pub struct Matrix4 {
-    pub m: [[f64; 4]; 4]
+    pub m: [[f64; 4]; 4],
 }
 
 impl Matrix4 {
-
     fn new(m: [[f64; 4]; 4]) -> Matrix4 {
         Matrix4 { m: m }
     }
 
     fn create_identity() -> Matrix4 {
-        Matrix4::new([
-            [1.0, 0.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0, 0.0],
-            [0.0, 0.0, 1.0, 0.0],
-            [0.0, 0.0, 0.0, 1.0]
-        ])
+        Matrix4::new([[1.0, 0.0, 0.0, 0.0],
+                      [0.0, 1.0, 0.0, 0.0],
+                      [0.0, 0.0, 1.0, 0.0],
+                      [0.0, 0.0, 0.0, 1.0]])
     }
 
     pub fn rot(axis: Axis, angle: f64) -> Matrix4 {
         let mut matrix = Matrix4::create_identity();
 
         match axis {
-          Axis::X => {
-              matrix.m[1][1] = angle.cos();
-              matrix.m[1][2] = -angle.sin();
-              matrix.m[2][1] = angle.sin();
-              matrix.m[2][2] = angle.cos();
-          },
+            Axis::X => {
+                matrix.m[1][1] = angle.cos();
+                matrix.m[1][2] = -angle.sin();
+                matrix.m[2][1] = angle.sin();
+                matrix.m[2][2] = angle.cos();
+            }
 
-          Axis::Y => {
-              matrix.m[0][0] = angle.cos();
-              matrix.m[0][2] = -angle.sin();
-              matrix.m[2][0] = angle.sin();
-              matrix.m[2][2] = angle.cos();
-          },
+            Axis::Y => {
+                matrix.m[0][0] = angle.cos();
+                matrix.m[0][2] = -angle.sin();
+                matrix.m[2][0] = angle.sin();
+                matrix.m[2][2] = angle.cos();
+            }
 
-          Axis::Z => {
-              matrix.m[0][0] = angle.cos();
-              matrix.m[0][1] = -angle.sin();
-              matrix.m[1][0] = angle.sin();
-              matrix.m[1][1] = angle.cos();
-          }
+            Axis::Z => {
+                matrix.m[0][0] = angle.cos();
+                matrix.m[0][1] = -angle.sin();
+                matrix.m[1][0] = angle.sin();
+                matrix.m[1][1] = angle.cos();
+            }
         }
 
         return matrix;
@@ -56,7 +53,7 @@ impl Matrix4 {
 
 #[cfg(test)]
 mod tests {
-    use hamcrest::{ assert_that, is, equal_to, close_to };
+    use hamcrest::{assert_that, is, equal_to, close_to};
     use matrix::Matrix4;
     use std::f64::consts::PI;
     use matrix::Axis::{X, Y, Z};

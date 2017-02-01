@@ -53,7 +53,7 @@ impl Camera {
             vertical_field_of_view: vertical_field_of_view,
             aspect_ratio: aspect_ratio,
             aperture: aperture,
-            distance_to_focus: distance_to_focus
+            distance_to_focus: distance_to_focus,
         }
     }
 
@@ -66,27 +66,23 @@ impl Camera {
     }
 
     pub fn look_at(&self, at: Vec3) -> Camera {
-        Camera::new(
-            self.origin,
-            at,
-            self.orthogonal_up,
-            self.vertical_field_of_view,
-            self.aspect_ratio,
-            self.aperture,
-            self.distance_to_focus
-        )
+        Camera::new(self.origin,
+                    at,
+                    self.orthogonal_up,
+                    self.vertical_field_of_view,
+                    self.aspect_ratio,
+                    self.aperture,
+                    self.distance_to_focus)
     }
 
     pub fn move_to(&self, origin: Vec3) -> Camera {
-        Camera::new(
-            origin,
-            self.view_point,
-            self.orthogonal_up,
-            self.vertical_field_of_view,
-            self.aspect_ratio,
-            self.aperture,
-            self.distance_to_focus
-        )
+        Camera::new(origin,
+                    self.view_point,
+                    self.orthogonal_up,
+                    self.vertical_field_of_view,
+                    self.aspect_ratio,
+                    self.aperture,
+                    self.distance_to_focus)
     }
 }
 

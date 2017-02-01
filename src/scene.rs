@@ -104,8 +104,6 @@ impl Sphere {
             refraction_index: Some(refraction_index),
         }
     }
-
-
 }
 
 impl Intersectable for Sphere {

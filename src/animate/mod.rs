@@ -1,7 +1,10 @@
 use vec::Vec3;
-use scene::{ Scene, Sphere };
+use scene::Scene;
 use camera::Camera;
-use color::Color;
+
+mod matrix;
+
+pub use self::matrix::*;
 
 #[derive(Clone, Debug)]
 pub struct Keyframe {
@@ -12,12 +15,11 @@ pub struct Keyframe {
 }
 
 impl Keyframe {
-    pub fn new(
-        t: usize,
-        camera_position: Vec3,
-        camera_look_at: Vec3,
-        positions: Vec<Vec3>
-    ) -> Keyframe {
+    pub fn new(t: usize,
+               camera_position: Vec3,
+               camera_look_at: Vec3,
+               positions: Vec<Vec3>)
+               -> Keyframe {
         Keyframe {
             t: t,
             camera_position: camera_position,
@@ -33,13 +35,12 @@ pub struct Keyframes {
 }
 
 impl Keyframes {
-
     pub fn new(frames: Vec<Keyframe>) -> Keyframes {
         Keyframes { frames: frames }
     }
 
     fn get_or_last(&self, i: usize) -> Keyframe {
-        let last = self.frames.len()-1;
+        let last = self.frames.len() - 1;
 
         if i < last {
             self.frames[i].clone()
@@ -53,7 +54,7 @@ impl Keyframes {
             let next = self.get_or_last(i);
 
             if next.t > t {
-                let prev = self.get_or_last(i-1);
+                let prev = self.get_or_last(i - 1);
 
                 let p = (t - prev.t) as f64 / (next.t - prev.t) as f64;
 
@@ -73,7 +74,7 @@ impl Keyframes {
             let next = self.get_or_last(i);
 
             if next.t > t {
-                let prev = self.get_or_last(i-1);
+                let prev = self.get_or_last(i - 1);
 
                 let p = (t - prev.t) as f64 / (next.t - prev.t) as f64;
 
@@ -94,7 +95,7 @@ impl Keyframes {
             let next = self.get_or_last(i);
 
             if next.t > t {
-                let prev = self.get_or_last(i-1);
+                let prev = self.get_or_last(i - 1);
 
                 let p = (t - prev.t) as f64 / (next.t - prev.t) as f64;
 
