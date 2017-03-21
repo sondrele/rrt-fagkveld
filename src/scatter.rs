@@ -1,4 +1,5 @@
 use rand::{self, Rng};
+use std::f64;
 use bmp;
 
 use ::vec::Vec3;
@@ -63,9 +64,14 @@ pub fn refraction(refraction_index: f64,
 }
 
 pub fn texture(texture: &bmp::Image, intersection: &Intersection) -> Option<(Color, Ray)> {
-    panic!("Step 6b) Calculate the (u, v) coordinates of the surface normal in the intersection, \
-            similarily to how you did it in Step 5. Then, convert the respective pixel from the \
-            texture to a Color. You can use the scatter_ray() function below to calculate the Ray.")
+    let d = intersection.normal;
+    let u = 0.5 + d.z.atan2(d.x) / (2.0 * f64::consts::PI);
+    let v = 0.5 - d.y.asin() / f64::consts::PI;
+    let x = ((1.0 - u) * texture.get_width() as f64) as u32;
+    let y = (v * texture.get_height() as f64) as u32;
+    let bmp::Pixel { r, g, b } = texture.get_pixel(x, y);
+    let color = Color::new(r as f64 / 255.99, g as f64 / 255.99, b as f64 / 255.99);
+    Some((color, scatter_ray(intersection)))
 }
 
 fn scatter_ray(intersection: &Intersection) -> Ray {

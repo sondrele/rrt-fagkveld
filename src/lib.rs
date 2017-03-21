@@ -43,6 +43,7 @@ pub fn trace_scene(width: u32,
                    camera: &Camera,
                    scene: &Scene)
                    -> Vec<Color> {
+    let env = bmp::open("imgs/sky.bmp").ok();
     let mut rng = rand::thread_rng();
     let mut pixels = Vec::with_capacity((width * height) as usize);
     for y in 0..height {
@@ -54,7 +55,7 @@ pub fn trace_scene(width: u32,
                 let v = ((height as f64 - y_trans - 1.0) + rng.next_f64()) / height as f64;
 
                 let ray = camera.create_ray(u, v);
-                color = color + trace_ray_in_scene(&ray, scene, 0);
+                color = color + trace_ray_in_scene(&ray, scene, 0, &env);
                 // color = panic!("Step 2b) Call the 'trace_ray_in_scene' function with the \
                 //                 appropriate parameters");
             }
@@ -65,24 +66,37 @@ pub fn trace_scene(width: u32,
     pixels
 }
 
-fn trace_ray_in_scene(ray: &Ray, scene: &Scene, depth: u32) -> Color {
+fn trace_ray_in_scene(ray: &Ray, scene: &Scene, depth: u32, env: &Option<bmp::Image>) -> Color {
     if depth == 50 {
         return Color::black(); // Return black to avoid being stuck with an unlimited recursion
     }
     match scene.intersects(ray, 0.0, f64::MAX) {
         Some(intersection) => {
             match intersection.shape.scatter(ray, &intersection) {
-                Some((attenuation, scattered)) => attenuation * trace_ray_in_scene(&scattered, scene, depth +1),
+                Some((attenuation, scattered)) => {
+                    attenuation * trace_ray_in_scene(&scattered, scene, depth + 1, env)
+                }
                 None => Color::black(),
             }
         }
-        None => gradient(ray),
+        None => gradient(ray, env),
     }
     // panic!("Step 2b) Return a gradient by calling the 'gradient' function, passing the ray as \
     //         parameter")
 }
 
-fn gradient(ray: &Ray) -> Color {
-    let t = 0.5 * (ray.direction.normalize().y + 1.0);
-    (1.0 - t) * Color::white() + t * Color::new(0.5, 0.7, 1.0)
+fn gradient(ray: &Ray, env: &Option<bmp::Image>) -> Color {
+    if let &Some(ref texture) = env {
+        let d = ray.direction;
+        let u = 0.5 + d.z.atan2(d.x) / (2.0 * f64::consts::PI);
+        let v = 0.5 - d.y.asin() / f64::consts::PI;
+        let x = ((1.0 - u) * texture.get_width() as f64) as u32;
+        let y = (v * texture.get_height() as f64) as u32;
+        let bmp::Pixel { r, g, b } = texture.get_pixel(x, y);
+        let color = Color::new(r as f64 / 255.99, g as f64 / 255.99, b as f64 / 255.99);
+        color
+    } else {
+        let t = 0.5 * (ray.direction.normalize().y + 1.0);
+        (1.0 - t) * Color::white() + t * Color::new(0.5, 0.7, 1.0)
+    }
 }

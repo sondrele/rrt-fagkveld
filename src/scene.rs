@@ -1,5 +1,7 @@
 use scatter;
 use prelude::*;
+use bmp;
+use std::rc::Rc;
 
 pub trait Intersectable {
     fn intersects(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Intersection>;
@@ -72,6 +74,7 @@ pub struct Sphere {
     pub color: Color,
     diffusiveness: Option<f64>,
     refraction_index: Option<f64>,
+    texture: Option<Rc<bmp::Image>>,
 }
 
 impl Sphere {
@@ -82,6 +85,7 @@ impl Sphere {
             color: color,
             diffusiveness: None,
             refraction_index: None,
+            texture: None,
         }
     }
 
@@ -92,6 +96,7 @@ impl Sphere {
             color: color,
             diffusiveness: Some(diffusiveness),
             refraction_index: None,
+            texture: None,
         }
     }
 
@@ -102,14 +107,23 @@ impl Sphere {
             color: color,
             diffusiveness: None,
             refraction_index: Some(refraction_index),
+            texture: None,
         }
     }
 
     pub fn texture(origin: Vec3, radius: f64, texture: &'static str) -> Sphere {
-        panic!("Step 6a) open the image located at the `texture` path, and add a new field to \
-                the Sphere struct. The new field should be a reference counted pointer to the \
-                texture image. Additionally, add a new Sphere to the scene by using the \
-                Sphere::texture(path) constructor.");
+        Sphere {
+            origin: origin,
+            radius: radius,
+            color: Color::black(),
+            diffusiveness: None,
+            refraction_index: None,
+            texture: Some(Rc::new(bmp::open(texture).unwrap())),
+        }
+        // panic!("Step 6a) open the image located at the `texture` path, and add a new field to \
+        //         the Sphere struct. The new field should be a reference counted pointer to the \
+        //         texture image. Additionally, add a new Sphere to the scene by using the \
+        //         Sphere::texture(path) constructor.");
     }
 }
 
@@ -144,6 +158,11 @@ impl Intersectable for Sphere {
             scatter::reflection(self.color, diffusiveness, ray, intersection)
         } else if let Some(refraction_index) = self.refraction_index {
             scatter::refraction(refraction_index, ray, intersection)
+        } else if let Some(ref texture) = self.texture {
+            // Step 6b)
+            // Add a new if-expression to handle the case when a Sphere has a texture, then
+            // call (and implement) the scatter::texture() function.
+            scatter::texture(texture, intersection)
         } else {
             scatter::diffusive(self.color, intersection)
         }
@@ -156,6 +175,7 @@ impl Intersectable for Sphere {
             color: self.color,
             diffusiveness: self.diffusiveness,
             refraction_index: self.refraction_index,
+            texture: self.texture.clone(),
         })
     }
 }

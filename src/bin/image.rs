@@ -17,12 +17,12 @@ fn create_camera(width: u32, height: u32) -> Camera {
     let aperture = 0.0;
     let distance_to_focus = (origin - view_point).length();
     Camera::new(origin,
-               view_point,
-               orthogonal_up,
-               vertical_field_of_view,
-               aspect_ratio,
-               aperture,
-               distance_to_focus)
+                view_point,
+                orthogonal_up,
+                vertical_field_of_view,
+                aspect_ratio,
+                aperture,
+                distance_to_focus)
     // panic!("Step 2a) Initialize and return a new Camera by calling its 'new' function with the \
     //         parameters defined above");
 }
@@ -53,10 +53,14 @@ fn create_scene() -> Scene {
             Color::new(0.7, 0.3, 0.7),
             1.5),
         ),
-        Box::new(Sphere::new(
+        Box::new(Sphere::texture(
             Vec3::new(0.0, 0.0, -1.0),
             0.5,
-            Color::new(0.1, 0.2, 0.5))),
+            "imgs/earth.bmp")),
+        // Box::new(Sphere::new(
+        //     Vec3::new(0.0, 0.0, -1.0),
+        //     0.5,
+        //     Color::new(0.1, 0.2, 0.5))),
         Box::new(Sphere::new(
             Vec3::new(0.0, -100.5, -1.0),
             100.0,
@@ -80,9 +84,7 @@ fn pixel_array_to_image(width: u32, height: u32, pixels: Vec<Color>) {
     let mut image = Image::new(width, height);
     for y in 0..height {
         for x in 0..width {
-            image.set_pixel(x,
-                            y,
-                            to_pixel(pixels[(y * width + x) as usize]));
+            image.set_pixel(x, y, to_pixel(pixels[(y * width + x) as usize]));
         }
     }
     let _ = image.save("scene.bmp");
