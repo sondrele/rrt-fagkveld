@@ -13,14 +13,14 @@ pub struct Intersection<'a> {
     pub distance: f64,
     pub intersection_point: Vec3,
     pub normal: Vec3,
-    pub material: &'a Mat,
+    pub material: &'a Material,
 }
 
 impl<'a> Intersection<'a> {
     pub fn new(distance: f64,
                intersection_point: Vec3,
                normal: Vec3,
-               material: &'a Mat)
+               material: &'a Material)
                -> Intersection<'a> {
         Intersection {
             distance: distance,
@@ -66,11 +66,11 @@ impl Intersectable for Scene {
 pub struct Sphere {
     pub origin: Vec3,
     pub radius: f64,
-    pub material: Mat,
+    pub material: Material,
 }
 
 impl Sphere {
-    pub fn new(origin: Vec3, radius: f64, material: Mat) -> Sphere {
+    pub fn new(origin: Vec3, radius: f64, material: Material) -> Sphere {
         Sphere {
             origin: origin,
             radius: radius,

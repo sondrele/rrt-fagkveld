@@ -134,7 +134,9 @@ mod tests {
 
         let r = reflect(v, Vec3::new(0.0, 1.0, 0.0));
 
-        expect!(r).to(be_equal_to(Vec3::new(1.0, 2.0, 0.0)));
+        expect!(r[0]).to(be_close_to(0.4472135954999579));
+        expect!(r[1]).to(be_close_to(0.8944271909999159));
+        expect!(r[2]).to(be_close_to(0.0));
     }
 
     #[test]

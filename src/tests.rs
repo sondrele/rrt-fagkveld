@@ -47,9 +47,9 @@ mod step_2 {
         let scene = Scene::new(vec![]);
         let ray = Ray::new(Vec3::new(0.0, 0.0, -1.0), Vec3::new(0.0, 0.0, 1.0));
 
-        let color = ::trace_ray_in_scene(&ray, &scene, 0);
+        let color = ::trace_ray_in_scene(&ray, &scene, 0, &None);
 
-        assert_that!(color, is(equal_to(::gradient(&ray))));
+        assert_that!(color, is(equal_to(::gradient(&ray, &None))));
     }
 }
 
@@ -69,7 +69,9 @@ mod step_3 {
 
     #[test]
     fn b_ray_should_intersect_with_sphere() {
-        let sphere = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 1.0, Color::white());
+        let sphere = Sphere::new(Vec3::new(0.0, 0.0, -1.0),
+                                 1.0,
+                                 Material::diffusive(Color::white()));
         let ray = Ray::new(Vec3::new(0.0, 0.0, -1.0), Vec3::new(0.0, 0.0, 1.0));
 
         let i = sphere.intersects(&ray, 0.0, 1000.0).unwrap();
@@ -81,7 +83,9 @@ mod step_3 {
 
     #[test]
     fn c_trace_ray_in_scene_should_return_the_color_of_the_intersected_scene() {
-        let sphere = Sphere::new(Vec3::new(0.0, 0.0, -1.0), 1.0, Color::black());
+        let sphere = Sphere::new(Vec3::new(0.0, 0.0, -1.0),
+                                 1.0,
+                                 Material::diffusive(Color::black()));
         let scene = Scene::new(vec![Box::new(sphere)]);
         let ray = Ray::new(Vec3::new(0.0, 0.0, -1.0), Vec3::new(0.0, 0.0, 1.0));
 

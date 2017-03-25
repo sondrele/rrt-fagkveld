@@ -32,27 +32,27 @@ fn create_scene() -> Scene {
         Box::new(Sphere::new(
             Vec3::new(0.5, -0.2, -0.4),
             0.3,
-            Mat::refractive(1.5))),
+            Material::refractive(1.5))),
         Box::new(Sphere::new(
             Vec3::new(1.1, 0.0, -1.2),
             0.5,
-            Mat::reflective(Color::new(0.6, 0.6, 0.6), 0.0))),
+            Material::reflective(Color::new(0.6, 0.6, 0.6), 0.0))),
         Box::new(Sphere::new(
             Vec3::new(-1.1, 0.0, -0.8),
             0.5,
-            Mat::refractive(1.5))),
+            Material::refractive(1.5))),
         Box::new(Sphere::new(
             Vec3::new(-1.1, 0.0, -0.8),
             -0.47,
-            Mat::refractive(1.5))),
+            Material::refractive(1.5))),
         Box::new(Sphere::new(
             Vec3::new(0.0, 0.0, -1.0),
             0.5,
-            Mat::texture("imgs/earth.bmp"))),
+            Material::texture("imgs/earth.bmp"))),
         Box::new(Sphere::new(
             Vec3::new(0.0, -100.5, -1.0),
             100.0,
-            Mat::diffusive(Color::new(0.5, 0.8, 0.0)))),
+            Material::diffusive(Color::new(0.5, 0.8, 0.0)))),
     ])
 }
 
