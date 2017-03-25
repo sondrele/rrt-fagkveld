@@ -92,10 +92,17 @@ fn main() {
     let mut encoder = Encoder::new(&mut image, width as u16, height as u16, &[]).unwrap();
     encoder.set(Repeat::Infinite).unwrap();
 
+    let options = raytracer::Options {
+        width: width,
+        height: height,
+        num_samples: number_of_samples,
+        environment: None
+    };
+
     for i in 0..50 {
         let (scene, camera) = animate(&orginal_scene, &orginal_camera, &frames, i);
 
-        let mut pixels = pixels_to_vec(raytracer::trace_scene(width, height, number_of_samples, &camera, &scene));
+        let mut pixels = pixels_to_vec(raytracer::trace_scene(&options, &camera, &scene));
 
         let frame = Frame::from_rgb(width as u16, height as u16, &mut *pixels);
 

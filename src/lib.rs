@@ -28,6 +28,7 @@ mod animate;
 mod tests;
 
 pub mod prelude {
+    pub use Options;
     pub use ray::Ray;
     pub use vec::Vec3;
     pub use matrix::Matrix4;
@@ -37,13 +38,15 @@ pub mod prelude {
     pub use animate::{animate, Keyframes, Keyframe};
 }
 
-pub fn trace_scene(width: u32,
-                   height: u32,
-                   num_samples: u32,
-                   camera: &Camera,
-                   scene: &Scene)
-                   -> Vec<Color> {
-    let env = bmp::open("imgs/sky.bmp").ok();
+pub struct Options {
+    pub width: u32,
+    pub height: u32,
+    pub num_samples: u32,
+    pub environment: Option<bmp::Image>,
+}
+
+pub fn trace_scene(options: &Options, camera: &Camera, scene: &Scene) -> Vec<Color> {
+    let &Options { width, height, num_samples, .. } = options;
     let mut rng = rand::thread_rng();
     let mut pixels = Vec::with_capacity((width * height) as usize);
     for y in 0..height {
@@ -55,7 +58,7 @@ pub fn trace_scene(width: u32,
                 let v = ((height as f64 - y_trans - 1.0) + rng.next_f64()) / height as f64;
 
                 let ray = camera.create_ray(u, v);
-                color = color + trace_ray_in_scene(&ray, scene, 0, &env);
+                color = color + trace_ray_in_scene(&ray, scene, 0, &options.environment);
                 // color = panic!("Step 2b) Call the 'trace_ray_in_scene' function with the \
                 //                 appropriate parameters");
             }

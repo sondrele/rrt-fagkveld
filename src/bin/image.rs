@@ -70,13 +70,20 @@ fn create_scene() -> Scene {
 
 
 fn main() {
-    let (width, height, number_of_samples) = (600, 300, 100);
+    let (width, height, number_of_samples) = (600, 300, 2);
     let camera = create_camera(width, height);
     // let camera = panic!("Step 2a) Initialize a camera by calling the 'create_camera()' \
     //                      function with the width and height defined above");
     let scene = create_scene();
 
-    let pixels = raytracer::trace_scene(width, height, number_of_samples, &camera, &scene);
+    let options = raytracer::Options {
+        width: width,
+        height: height,
+        num_samples: number_of_samples,
+        environment: bmp::open("imgs/sky.bmp").ok(),
+    };
+
+    let pixels = raytracer::trace_scene(&options, &camera, &scene);
     pixel_array_to_image(width, height, pixels)
 }
 
