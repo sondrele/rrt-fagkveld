@@ -1,7 +1,3 @@
-#![allow(dead_code)]
-#![allow(unreachable_code)]
-#![allow(unused_variables)]
-
 extern crate raytracer;
 extern crate bmp;
 
@@ -23,8 +19,6 @@ fn create_camera(width: u32, height: u32) -> Camera {
                 aspect_ratio,
                 aperture,
                 distance_to_focus)
-    // panic!("Step 2a) Initialize and return a new Camera by calling its 'new' function with the \
-    //         parameters defined above");
 }
 
 fn create_scene() -> Scene {
@@ -60,8 +54,6 @@ fn create_scene() -> Scene {
 fn main() {
     let (width, height, number_of_samples) = (600, 300, 2);
     let camera = create_camera(width, height);
-    // let camera = panic!("Step 2a) Initialize a camera by calling the 'create_camera()' \
-    //                      function with the width and height defined above");
     let scene = create_scene();
 
     let options = raytracer::Options {

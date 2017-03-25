@@ -64,8 +64,6 @@ impl Material {
 mod tests {
     use expectest::prelude::*;
     use prelude::*;
-    use scatter::*;
-
 
     #[test]
     fn should_reflect_ray() {

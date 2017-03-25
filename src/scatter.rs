@@ -125,7 +125,6 @@ fn shlick_approximation(cosine: f64, refraction_index: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use expectest::prelude::*;
-    use prelude::*;
     use super::*;
 
     #[test]
