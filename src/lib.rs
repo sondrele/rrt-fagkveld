@@ -6,6 +6,9 @@
 #[cfg(test)]
 #[macro_use]
 extern crate hamcrest;
+#[cfg(test)]
+#[macro_use]
+extern crate expectest;
 
 extern crate rand;
 extern crate bmp;
@@ -15,6 +18,7 @@ use std::f64;
 use rand::Rng;
 use prelude::*;
 
+mod material;
 mod scatter;
 mod vec;
 mod ray;
@@ -34,7 +38,8 @@ pub mod prelude {
     pub use matrix::Matrix4;
     pub use color::Color;
     pub use camera::Camera;
-    pub use scene::{Scene, Sphere, Intersectable};
+    pub use scene::{Scene, Sphere, Intersectable, Intersection};
+    pub use material::*;
     pub use animate::{animate, Keyframes, Keyframe};
 }
 
@@ -75,7 +80,7 @@ fn trace_ray_in_scene(ray: &Ray, scene: &Scene, depth: u32, env: &Option<bmp::Im
     }
     match scene.intersects(ray, 0.0, f64::MAX) {
         Some(intersection) => {
-            match intersection.shape.scatter(ray, &intersection) {
+            match intersection.material.scatter(ray, &intersection) {
                 Some((attenuation, scattered)) => {
                     attenuation * trace_ray_in_scene(&scattered, scene, depth + 1, env)
                 }

@@ -85,7 +85,7 @@ mod step_3 {
         let scene = Scene::new(vec![Box::new(sphere)]);
         let ray = Ray::new(Vec3::new(0.0, 0.0, -1.0), Vec3::new(0.0, 0.0, 1.0));
 
-        let color = ::trace_ray_in_scene(&ray, &scene, 0);
+        let color = ::trace_ray_in_scene(&ray, &scene, 0, &None);
 
         assert_that!(color, is(equal_to(Color::black())));
     }
@@ -95,8 +95,8 @@ mod step_3 {
         let scene = Scene::new(vec![]);
         let ray = Ray::new(Vec3::new(0.0, 0.0, -1.0), Vec3::new(0.0, 0.0, 1.0));
 
-        let color = ::trace_ray_in_scene(&ray, &scene, 0);
+        let color = ::trace_ray_in_scene(&ray, &scene, 0, &None);
 
-        assert_that!(color, is(equal_to(::gradient(&ray))));
+        assert_that!(color, is(equal_to(::gradient(&ray, &None))));
     }
 }

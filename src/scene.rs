@@ -6,31 +6,27 @@ use std::rc::Rc;
 pub trait Intersectable {
     fn intersects(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Intersection>;
 
-    fn scatter(&self, _: &Ray, _: &Intersection) -> Option<(Color, Ray)> {
-        None
-    }
-
     fn move_to(&self, vec: Vec3) -> Box<Intersectable>;
 }
 
-pub struct Intersection {
+pub struct Intersection<'a> {
     pub distance: f64,
     pub intersection_point: Vec3,
     pub normal: Vec3,
-    pub shape: Box<Intersectable>,
+    pub material: &'a Mat,
 }
 
-impl Intersection {
+impl<'a> Intersection<'a> {
     pub fn new(distance: f64,
                intersection_point: Vec3,
                normal: Vec3,
-               shape: Box<Intersectable>)
-               -> Intersection {
+               material: &'a Mat)
+               -> Intersection<'a> {
         Intersection {
             distance: distance,
             intersection_point: intersection_point,
             normal: normal,
-            shape: shape,
+            material: material,
         }
     }
 }
@@ -67,63 +63,19 @@ impl Intersectable for Scene {
     }
 }
 
-#[derive(Clone)]
 pub struct Sphere {
     pub origin: Vec3,
     pub radius: f64,
-    pub color: Color,
-    diffusiveness: Option<f64>,
-    refraction_index: Option<f64>,
-    texture: Option<Rc<bmp::Image>>,
+    pub material: Mat,
 }
 
 impl Sphere {
-    pub fn new(origin: Vec3, radius: f64, color: Color) -> Sphere {
+    pub fn new(origin: Vec3, radius: f64, material: Mat) -> Sphere {
         Sphere {
             origin: origin,
             radius: radius,
-            color: color,
-            diffusiveness: None,
-            refraction_index: None,
-            texture: None,
+            material: material,
         }
-    }
-
-    pub fn reflective(origin: Vec3, radius: f64, color: Color, diffusiveness: f64) -> Sphere {
-        Sphere {
-            origin: origin,
-            radius: radius,
-            color: color,
-            diffusiveness: Some(diffusiveness),
-            refraction_index: None,
-            texture: None,
-        }
-    }
-
-    pub fn refractive(origin: Vec3, radius: f64, color: Color, refraction_index: f64) -> Sphere {
-        Sphere {
-            origin: origin,
-            radius: radius,
-            color: color,
-            diffusiveness: None,
-            refraction_index: Some(refraction_index),
-            texture: None,
-        }
-    }
-
-    pub fn texture(origin: Vec3, radius: f64, texture: &'static str) -> Sphere {
-        Sphere {
-            origin: origin,
-            radius: radius,
-            color: Color::black(),
-            diffusiveness: None,
-            refraction_index: None,
-            texture: Some(Rc::new(bmp::open(texture).unwrap())),
-        }
-        // panic!("Step 6a) open the image located at the `texture` path, and add a new field to \
-        //         the Sphere struct. The new field should be a reference counted pointer to the \
-        //         texture image. Additionally, add a new Sphere to the scene by using the \
-        //         Sphere::texture(path) constructor.");
     }
 }
 
@@ -150,43 +102,17 @@ impl Intersectable for Sphere {
         }
     }
 
-    fn scatter(&self, ray: &Ray, intersection: &Intersection) -> Option<(Color, Ray)> {
-        // Step 6b)
-        // Add a new if-expression to handle the case when a Sphere has a texture, then
-        // call (and implement) the scatter::texture() function.
-        if let Some(diffusiveness) = self.diffusiveness {
-            scatter::reflection(self.color, diffusiveness, ray, intersection)
-        } else if let Some(refraction_index) = self.refraction_index {
-            scatter::refraction(refraction_index, ray, intersection)
-        } else if let Some(ref texture) = self.texture {
-            // Step 6b)
-            // Add a new if-expression to handle the case when a Sphere has a texture, then
-            // call (and implement) the scatter::texture() function.
-            scatter::texture(texture, intersection)
-        } else {
-            scatter::diffusive(self.color, intersection)
-        }
-    }
-
     fn move_to(&self, vec: Vec3) -> Box<Intersectable> {
         Box::new(Sphere {
             origin: vec,
             radius: self.radius,
-            color: self.color,
-            diffusiveness: self.diffusiveness,
-            refraction_index: self.refraction_index,
-            texture: self.texture.clone(),
+            material: self.material.clone()
         })
     }
 }
 
-fn create_intersection(sphere: &Sphere, delta: f64, ray: &Ray) -> Option<Intersection> {
+fn create_intersection<'a>(sphere: &'a Sphere, delta: f64, ray: &Ray) -> Option<Intersection<'a>> {
     let intersection_point = ray.point_along_direction(delta);
     let surface_normal = (intersection_point - sphere.origin) / sphere.radius;
-    // let surface_normal = panic!("Step 3b) Calculate the surface normal. Hint: The formula is \
-    //                              available in the README");
-    Some(Intersection::new(delta,
-                           intersection_point,
-                           surface_normal,
-                           Box::new(sphere.clone())))
+    Some(Intersection::new(delta, intersection_point, surface_normal, &sphere.material))
 }

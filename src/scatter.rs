@@ -121,3 +121,39 @@ fn shlick_approximation(cosine: f64, refraction_index: f64) -> f64 {
     let r0 = r0 * r0;
     r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
 }
+
+#[cfg(test)]
+mod tests {
+    use expectest::prelude::*;
+    use prelude::*;
+    use super::*;
+
+    #[test]
+    fn should_reflect_point() {
+        let v = Vec3::new(1.0, -2.0, 0.0);
+
+        let r = reflect(v, Vec3::new(0.0, 1.0, 0.0));
+
+        expect!(r).to(be_equal_to(Vec3::new(1.0, 2.0, 0.0)));
+    }
+
+    #[test]
+    fn should_refract_point() {
+        let v = Vec3::new(0.0, -1.0, -1.0);
+
+        let r = refract(v, Vec3::new(0.0, 1.0, 0.0), 1.0 / 1.5).unwrap();
+
+        expect!(r[0]).to(be_close_to(0.0));
+        expect!(r[1]).to(be_close_to(-0.881917103688197));
+        expect!(r[2]).to(be_close_to(-0.4714045207910316));
+    }
+
+    #[test]
+    fn should_calculate_random_point_in_unit_hemisphere() {
+        let p = random_point_in_unit_sphere();
+
+        expect!(p.x).to(be_less_than(1.0));
+        expect!(p.y).to(be_less_than(1.0));
+        expect!(p.z).to(be_less_than(1.0));
+    }
+}

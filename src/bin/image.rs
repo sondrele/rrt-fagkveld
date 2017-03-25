@@ -29,42 +29,30 @@ fn create_camera(width: u32, height: u32) -> Camera {
 
 fn create_scene() -> Scene {
     Scene::new(vec![
-        Box::new(Sphere::refractive(
+        Box::new(Sphere::new(
             Vec3::new(0.5, -0.2, -0.4),
             0.3,
-            Color::new(0.6, 0.3, 0.0),
-            1.5),
-        ),
-        Box::new(Sphere::reflective(
+            Mat::refractive(1.5))),
+        Box::new(Sphere::new(
             Vec3::new(1.1, 0.0, -1.2),
             0.5,
-            Color::new(0.6, 0.6, 0.6),
-            0.0),
-        ),
-        Box::new(Sphere::refractive(
+            Mat::reflective(Color::new(0.6, 0.6, 0.6), 0.0))),
+        Box::new(Sphere::new(
             Vec3::new(-1.1, 0.0, -0.8),
             0.5,
-            Color::new(0.7, 0.3, 0.7),
-            1.5),
-        ),
-        Box::new(Sphere::refractive(
+            Mat::refractive(1.5))),
+        Box::new(Sphere::new(
             Vec3::new(-1.1, 0.0, -0.8),
             -0.47,
-            Color::new(0.7, 0.3, 0.7),
-            1.5),
-        ),
-        Box::new(Sphere::texture(
+            Mat::refractive(1.5))),
+        Box::new(Sphere::new(
             Vec3::new(0.0, 0.0, -1.0),
             0.5,
-            "imgs/earth.bmp")),
-        // Box::new(Sphere::new(
-        //     Vec3::new(0.0, 0.0, -1.0),
-        //     0.5,
-        //     Color::new(0.1, 0.2, 0.5))),
+            Mat::texture("imgs/earth.bmp"))),
         Box::new(Sphere::new(
             Vec3::new(0.0, -100.5, -1.0),
             100.0,
-            Color::new(0.5, 0.8, 0.0))),
+            Mat::diffusive(Color::new(0.5, 0.8, 0.0)))),
     ])
 }
 
