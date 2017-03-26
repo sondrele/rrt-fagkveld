@@ -11,6 +11,7 @@ hamcrest = "0.1"
 expectest = "0.5.1"
 
 [dependencies]
+wavefront_obj = "5.0.0"
 bmp = "0.2"
 rand = "0.3"
 rayon= "0.6"

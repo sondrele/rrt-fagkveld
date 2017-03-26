@@ -2,7 +2,10 @@ use bmp;
 use scatter;
 use prelude::*;
 
-#[derive(Clone)]
+extern crate wavefront_obj;
+use wavefront_obj::mtl;
+
+#[derive(Clone, Debug)]
 pub struct Material {
     albedo: Color,
     diffusiveness: Option<f64>,
@@ -11,6 +14,24 @@ pub struct Material {
 }
 
 impl Material {
+    pub fn from_mtl(material: &mtl::Material) -> Material {
+        // pub specular_coefficient: f64,
+        // pub color_ambient: Color,
+        // pub color_diffuse: Color,
+        // pub color_specular: Color,
+        // pub color_emissive: Option<Color>,
+        // pub optical_density: Option<f64>,
+        // pub alpha: f64,
+        // pub illumination: Illumination,
+        // pub uv_map: Option<String>,
+        Material {
+            albedo: Color::new(material.color_diffuse.r, material.color_diffuse.g, material.color_diffuse.b),
+            diffusiveness: None,
+            refraction_index: None,
+            texture: None,
+        }
+    }
+
     pub fn diffusive(albedo: Color) -> Material {
         Material {
             albedo: albedo,
@@ -55,6 +76,7 @@ impl Material {
         } else if let Some(ref texture) = self.texture {
             scatter::texture(texture, intersection)
         } else {
+            // println!("{:?}", self.albedo);
             scatter::diffusive(self.albedo, intersection)
         }
     }

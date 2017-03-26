@@ -8,6 +8,7 @@ extern crate expectest;
 extern crate rand;
 extern crate bmp;
 extern crate rayon;
+extern crate wavefront_obj;
 
 use std::f64;
 use rand::Rng;
@@ -20,6 +21,8 @@ mod ray;
 mod color;
 mod camera;
 mod scene;
+
+pub use scene::*;
 
 #[cfg(test)]
 mod tests;
@@ -55,8 +58,6 @@ pub fn trace_scene(options: &Options, camera: &Camera, scene: &Scene) -> Vec<Col
 
                 let ray = camera.create_ray(u, v);
                 color = color + trace_ray_in_scene(&ray, scene, 0, &options.environment);
-                // color = panic!("Step 2b) Call the 'trace_ray_in_scene' function with the \
-                //                 appropriate parameters");
             }
             color = color / num_samples as f64;
             pixels.push(color.gamma2());
@@ -80,8 +81,6 @@ fn trace_ray_in_scene(ray: &Ray, scene: &Scene, depth: u32, env: &Option<bmp::Im
         }
         None => gradient(ray, env),
     }
-    // panic!("Step 2b) Return a gradient by calling the 'gradient' function, passing the ray as \
-    //         parameter")
 }
 
 fn gradient(ray: &Ray, env: &Option<bmp::Image>) -> Color {
