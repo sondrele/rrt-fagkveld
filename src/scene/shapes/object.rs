@@ -1,6 +1,11 @@
 use wavefront_obj::obj::{self, Primitive};
 use prelude::*;
 
+#[allow(dead_code)]
+struct Object {
+    shapes: Vec<Mesh>,
+}
+
 pub struct Mesh {
     triangles: Vec<Triangle>,
     material: Material,
@@ -118,8 +123,8 @@ impl Vertex {
         let (vertex_index, texture_index, normal_index) = vtn;
         Vertex {
             coordinate: object.vertices[vertex_index].into(),
-            normal: texture_index.map(|index| object.normals[index].into()),
-            texture_coordinate: normal_index.map(|index| object.tex_vertices[index].into()),
+            normal: normal_index.map(|index| object.normals[index].into()),
+            texture_coordinate: texture_index.map(|index| object.tex_vertices[index].into()),
         }
     }
 }
