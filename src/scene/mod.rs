@@ -86,12 +86,20 @@ fn parse(obj_path: &Path) -> Scene {
         })
         .unwrap_or(default_material());
 
-    let shapes: Vec<_> = obj_set.objects
+    let shapes = obj_set.objects
         .iter()
-        .map(|obj| Box::new(Object::new(obj.clone(), materials.clone())) as Box<Intersectable>)
+        .flat_map(|obj| {
+            obj.geometry
+                .iter()
+                .map(|geometry| {
+                    let name = &geometry.material_name.clone().unwrap_or(String::from("default"));
+                    let material = materials.get(name).unwrap();
+                    Mesh::from(obj, geometry, material.clone())
+                })
+                .collect::<Vec<Mesh>>()
+        })
+        .map(|mesh| Box::new(mesh) as Box<Intersectable>)
         .collect();
-
-    println!("{:?}", shapes.len());
 
     Scene::new(shapes)
 }

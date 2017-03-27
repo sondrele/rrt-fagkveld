@@ -2,5 +2,5 @@
 mod object;
 mod sphere;
 
-pub use self::object::Object;
-pub use self::sphere::Sphere;
+pub use self::object::*;
+pub use self::sphere::*;

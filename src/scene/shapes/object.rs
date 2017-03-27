@@ -1,86 +1,46 @@
-use std::collections::HashMap;
 use wavefront_obj::obj::{self, Primitive};
 use prelude::*;
 
-pub struct Object {
-    pub object: obj::Object,
-    pub materials: HashMap<String, Material>,
+pub struct Mesh {
+    triangles: Vec<Triangle>,
+    material: Material,
 }
 
-impl Object {
-    pub fn new(object: obj::Object, materials: HashMap<String, Material>) -> Object {
-        Object {
-            object: object,
-            materials: materials,
+impl Mesh {
+    pub fn from(object: &obj::Object, geometry: &obj::Geometry, material: Material) -> Mesh {
+        let triangles = geometry.shapes
+            .iter()
+            .map(|shape| match shape.primitive {
+                Primitive::Triangle(x, y, z) => {
+                    Triangle::new([Vertex::new(x, object),
+                                   Vertex::new(y, object),
+                                   Vertex::new(z, object)])
+                }
+                _ => panic!("Only Triangle is supported of obj primitives"),
+
+            })
+            .collect();
+        Mesh {
+            triangles: triangles,
+            material: material,
         }
     }
 }
 
-impl Intersectable for Object {
+impl Intersectable for Mesh {
     fn intersects(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Intersection> {
         let mut intersection: Option<Intersection> = None;
         let mut closest_so_far: f64 = t_max;
-
-        let &Object { ref object, ref materials } = self;
-        for geometry in &object.geometry {
-            let name: &String = &geometry.material_name.clone().unwrap_or("default".to_string());
-            let material = materials.get(name).unwrap();
-            for s in &geometry.shapes {
-                match s.primitive {
-                    Primitive::Triangle(x, y, z) => {
-                        let triangle = Triangle::new([Vertex::new(x, object),
-                                                      Vertex::new(y, object),
-                                                      Vertex::new(z, object)]);
-                        match intersects(triangle, ray, material, t_min, closest_so_far) {
-                            Some(other_intersection) => {
-                                closest_so_far = other_intersection.distance;
-                                intersection = Some(other_intersection);
-                            }
-                            None => (),
-                        }
-                    }
-                    _ => panic!("Only Triangle is supported of obj primitives"),
+        for triangle in &self.triangles {
+            match intersects(&triangle, ray, &self.material, t_min, closest_so_far) {
+                Some(other_intersection) => {
+                    closest_so_far = other_intersection.distance;
+                    intersection = Some(other_intersection);
                 }
+                None => (),
             }
         }
         intersection
-    }
-}
-
-impl Into<Vec3> for obj::Vertex {
-    fn into(self) -> Vec3 {
-        Vec3 {
-            x: self.x,
-            y: self.y,
-            z: self.z,
-        }
-    }
-}
-
-impl Into<Vec3> for obj::TVertex {
-    fn into(self) -> Vec3 {
-        Vec3 {
-            x: self.u,
-            y: self.v,
-            z: self.w,
-        }
-    }
-}
-
-struct Vertex {
-    coordinate: Vec3,
-    normal: Option<Vec3>,
-    texture_coordinate: Option<Vec3>,
-}
-
-impl Vertex {
-    fn new(vtn: obj::VTNIndex, object: &obj::Object) -> Vertex {
-        let (vertex_index, texture_index, normal_index) = vtn;
-        Vertex {
-            coordinate: object.vertices[vertex_index].into(),
-            normal: texture_index.map(|index| object.normals[index].into()),
-            texture_coordinate: normal_index.map(|index| object.tex_vertices[index].into()),
-        }
     }
 }
 
@@ -94,7 +54,7 @@ impl Triangle {
     }
 }
 
-fn intersects<'a>(triangle: Triangle,
+fn intersects<'a>(triangle: &Triangle,
                   ray: &Ray,
                   material: &'a Material,
                   t_min: f64,
@@ -144,5 +104,42 @@ fn intersects<'a>(triangle: Triangle,
         // this means that there is
         // a line intersection but not a ray intersection
         None
+    }
+}
+
+struct Vertex {
+    coordinate: Vec3,
+    normal: Option<Vec3>,
+    texture_coordinate: Option<Vec3>,
+}
+
+impl Vertex {
+    fn new(vtn: obj::VTNIndex, object: &obj::Object) -> Vertex {
+        let (vertex_index, texture_index, normal_index) = vtn;
+        Vertex {
+            coordinate: object.vertices[vertex_index].into(),
+            normal: texture_index.map(|index| object.normals[index].into()),
+            texture_coordinate: normal_index.map(|index| object.tex_vertices[index].into()),
+        }
+    }
+}
+
+impl Into<Vec3> for obj::Vertex {
+    fn into(self) -> Vec3 {
+        Vec3 {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+        }
+    }
+}
+
+impl Into<Vec3> for obj::TVertex {
+    fn into(self) -> Vec3 {
+        Vec3 {
+            x: self.u,
+            y: self.v,
+            z: self.w,
+        }
     }
 }
