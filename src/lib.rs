@@ -10,6 +10,7 @@ extern crate bmp;
 extern crate rayon;
 extern crate wavefront_obj;
 
+use std::time::Instant;
 use std::f64;
 use rand::Rng;
 use prelude::*;
@@ -45,6 +46,9 @@ pub struct Options {
 }
 
 pub fn trace_scene(options: &Options, camera: &Camera, scene: &Scene) -> Vec<Color> {
+    println!("Tracing scene...");
+    let tracing = Instant::now();
+
     let &Options { width, height, num_samples, .. } = options;
     let mut rng = rand::thread_rng();
     let mut pixels = Vec::with_capacity((width * height) as usize);
@@ -62,7 +66,10 @@ pub fn trace_scene(options: &Options, camera: &Camera, scene: &Scene) -> Vec<Col
             color = color / num_samples as f64;
             pixels.push(color.gamma2());
         }
+        println!("... {} %", (y as f32 / height as f32 * 100.0) as u32);
     }
+    let duration = tracing.elapsed();
+    println!("Tracing done in: {},{} s", duration.as_secs(), (duration.subsec_nanos() as f32 / 1_000_000.0) as u32);
     pixels
 }
 

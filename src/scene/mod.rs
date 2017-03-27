@@ -1,3 +1,4 @@
+use std::time::Instant;
 use std::io::prelude::*;
 use std::fs::File;
 use std::collections::HashMap;
@@ -68,6 +69,9 @@ impl Intersectable for Scene {
 }
 
 fn parse(obj_path: &Path) -> Scene {
+    println!("Parsing scene...");
+    let parsing = Instant::now();
+
     let obj_set = obj::parse(read_file(obj_path)).unwrap();
 
     let materials = obj_set.material_library
@@ -100,6 +104,9 @@ fn parse(obj_path: &Path) -> Scene {
         })
         .map(|mesh| Box::new(mesh) as Box<Intersectable>)
         .collect();
+
+    let duration = parsing.elapsed();
+    println!("Parsing done in: {},{} s", duration.as_secs(), (duration.subsec_nanos() as f32 / 1_000_000.0) as u32);
 
     Scene::new(shapes)
 }
