@@ -2,35 +2,35 @@ use std::collections::HashMap;
 use wavefront_obj::obj::{self, Primitive};
 use prelude::*;
 
-pub struct Mesh {
+pub struct Object {
     pub object: obj::Object,
     pub materials: HashMap<String, Material>,
 }
 
-impl Mesh {
-    pub fn new(object: obj::Object, materials: HashMap<String, Material>) -> Mesh {
-        Mesh {
+impl Object {
+    pub fn new(object: obj::Object, materials: HashMap<String, Material>) -> Object {
+        Object {
             object: object,
             materials: materials,
         }
     }
 }
 
-impl Intersectable for Mesh {
+impl Intersectable for Object {
     fn intersects(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Intersection> {
         let mut intersection: Option<Intersection> = None;
         let mut closest_so_far: f64 = t_max;
 
-        let &Mesh { ref object, ref materials } = self;
+        let &Object { ref object, ref materials } = self;
         for geometry in &object.geometry {
             let name: &String = &geometry.material_name.clone().unwrap_or("default".to_string());
             let material = materials.get(name).unwrap();
             for s in &geometry.shapes {
                 match s.primitive {
                     Primitive::Triangle(x, y, z) => {
-                        let triangle = Triangle::new(object.vertices[x.0],
-                                                     object.vertices[y.0],
-                                                     object.vertices[z.0]);
+                        let triangle = Triangle::new([Vertex::new(x, object),
+                                                      Vertex::new(y, object),
+                                                      Vertex::new(z, object)]);
                         match intersects(triangle, ray, material, t_min, closest_so_far) {
                             Some(other_intersection) => {
                                 closest_so_far = other_intersection.distance;
@@ -47,17 +47,50 @@ impl Intersectable for Mesh {
     }
 }
 
+impl Into<Vec3> for obj::Vertex {
+    fn into(self) -> Vec3 {
+        Vec3 {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+        }
+    }
+}
+
+impl Into<Vec3> for obj::TVertex {
+    fn into(self) -> Vec3 {
+        Vec3 {
+            x: self.u,
+            y: self.v,
+            z: self.w,
+        }
+    }
+}
+
+struct Vertex {
+    coordinate: Vec3,
+    normal: Option<Vec3>,
+    texture_coordinate: Option<Vec3>,
+}
+
+impl Vertex {
+    fn new(vtn: obj::VTNIndex, object: &obj::Object) -> Vertex {
+        let (vertex_index, texture_index, normal_index) = vtn;
+        Vertex {
+            coordinate: object.vertices[vertex_index].into(),
+            normal: texture_index.map(|index| object.normals[index].into()),
+            texture_coordinate: normal_index.map(|index| object.tex_vertices[index].into()),
+        }
+    }
+}
+
 struct Triangle {
-    vertices: [Vec3; 3],
+    vertices: [Vertex; 3],
 }
 
 impl Triangle {
-    fn new(a: obj::Vertex, b: obj::Vertex, c: obj::Vertex) -> Triangle {
-        Triangle {
-            vertices: [Vec3::new(a.x, a.y, a.z),
-                       Vec3::new(b.x, b.y, b.z),
-                       Vec3::new(c.x, c.y, c.z)],
-        }
+    fn new(vertices: [Vertex; 3]) -> Triangle {
+        Triangle { vertices: vertices }
     }
 }
 
@@ -69,9 +102,9 @@ fn intersects<'a>(triangle: Triangle,
                   -> Option<Intersection<'a>> {
     let p: Vec3 = ray.origin;
     let d: Vec3 = ray.direction;
-    let v0: Vec3 = triangle.vertices[0];
-    let v1: Vec3 = triangle.vertices[1];
-    let v2: Vec3 = triangle.vertices[2];
+    let v0: Vec3 = triangle.vertices[0].coordinate;
+    let v1: Vec3 = triangle.vertices[1].coordinate;
+    let v2: Vec3 = triangle.vertices[2].coordinate;
 
     let e1: Vec3 = v1 - v0;
     let e2: Vec3 = v2 - v0;
@@ -79,7 +112,8 @@ fn intersects<'a>(triangle: Triangle,
     let h: Vec3 = d.cross(e2);
     let a0: f64 = e1.dot(h);
 
-    if a0 == 0.0 { //> -0.00000001 && a0 < 0.00000001 {
+    if a0 == 0.0 {
+        // > -0.00000001 && a0 < 0.00000001 {
         return None;
     }
 
@@ -104,9 +138,7 @@ fn intersects<'a>(triangle: Triangle,
 
     if t < t_max && t > t_min {
         let intersection_point = ray.point_along_direction(t);
-        let v = triangle.vertices[1] - triangle.vertices[0];
-        let w = triangle.vertices[2] - triangle.vertices[0];
-        let normal = v.cross(w).normalize();
+        let normal = e1.cross(e2).normalize();
         Some(Intersection::new(t, intersection_point, normal, material))
     } else {
         // this means that there is

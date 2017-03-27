@@ -86,10 +86,12 @@ fn parse(obj_path: &Path) -> Scene {
         })
         .unwrap_or(default_material());
 
-    let shapes = obj_set.objects
+    let shapes: Vec<_> = obj_set.objects
         .iter()
-        .map(|obj| Box::new(Mesh::new(obj.clone(), materials.clone())) as Box<Intersectable>)
+        .map(|obj| Box::new(Object::new(obj.clone(), materials.clone())) as Box<Intersectable>)
         .collect();
+
+    println!("{:?}", shapes.len());
 
     Scene::new(shapes)
 }
