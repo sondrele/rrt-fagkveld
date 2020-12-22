@@ -1,5 +1,5 @@
-use scatter;
 use prelude::*;
+use scatter;
 
 pub trait Intersectable {
     fn intersects(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Intersection>;
@@ -8,22 +8,23 @@ pub trait Intersectable {
         None
     }
 
-    fn move_to(&self, vec: Vec3) -> Box<Intersectable>;
+    fn move_to(&self, vec: Vec3) -> Box<dyn Intersectable>;
 }
 
 pub struct Intersection {
     pub distance: f64,
     pub intersection_point: Vec3,
     pub normal: Vec3,
-    pub shape: Box<Intersectable>,
+    pub shape: Box<dyn Intersectable>,
 }
 
 impl Intersection {
-    pub fn new(distance: f64,
-               intersection_point: Vec3,
-               normal: Vec3,
-               shape: Box<Intersectable>)
-               -> Intersection {
+    pub fn new(
+        distance: f64,
+        intersection_point: Vec3,
+        normal: Vec3,
+        shape: Box<dyn Intersectable>,
+    ) -> Intersection {
         Intersection {
             distance: distance,
             intersection_point: intersection_point,
@@ -34,11 +35,11 @@ impl Intersection {
 }
 
 pub struct Scene {
-    pub shapes: Vec<Box<Intersectable>>,
+    pub shapes: Vec<Box<dyn Intersectable>>,
 }
 
 impl Scene {
-    pub fn new(shapes: Vec<Box<Intersectable>>) -> Scene {
+    pub fn new(shapes: Vec<Box<dyn Intersectable>>) -> Scene {
         Scene { shapes: shapes }
     }
 }
@@ -60,7 +61,7 @@ impl Intersectable for Scene {
         intersection
     }
 
-    fn move_to(&self, _: Vec3) -> Box<Intersectable> {
+    fn move_to(&self, _: Vec3) -> Box<dyn Intersectable> {
         Box::new(Scene::new(vec![]))
     }
 }
@@ -106,10 +107,12 @@ impl Sphere {
     }
 
     pub fn texture(origin: Vec3, radius: f64, texture: &'static str) -> Sphere {
-        panic!("Step 6a) open the image located at the `texture` path, and add a new field to \
+        panic!(
+            "Step 6a) open the image located at the `texture` path, and add a new field to \
                 the Sphere struct. The new field should be a reference counted pointer to the \
                 texture image. Additionally, add a new Sphere to the scene by using the \
-                Sphere::texture(path) constructor.");
+                Sphere::texture(path) constructor."
+        );
     }
 }
 
@@ -149,7 +152,7 @@ impl Intersectable for Sphere {
         }
     }
 
-    fn move_to(&self, vec: Vec3) -> Box<Intersectable> {
+    fn move_to(&self, vec: Vec3) -> Box<dyn Intersectable> {
         Box::new(Sphere {
             origin: vec,
             radius: self.radius,
@@ -162,10 +165,14 @@ impl Intersectable for Sphere {
 
 fn create_intersection(sphere: &Sphere, delta: f64, ray: &Ray) -> Option<Intersection> {
     let intersection_point = ray.point_along_direction(delta);
-    let surface_normal = panic!("Step 3b) Calculate the surface normal. Hint: The formula is \
-                                 available in the README");
-    Some(Intersection::new(delta,
-                           intersection_point,
-                           surface_normal,
-                           Box::new(sphere.clone())))
+    let surface_normal = panic!(
+        "Step 3b) Calculate the surface normal. Hint: The formula is \
+                                 available in the README"
+    );
+    Some(Intersection::new(
+        delta,
+        intersection_point,
+        surface_normal,
+        Box::new(sphere.clone()),
+    ))
 }

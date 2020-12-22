@@ -1,5 +1,5 @@
-use std::f64::consts::PI;
 use rand::{self, Rng};
+use std::f64::consts::PI;
 
 use prelude::*;
 
@@ -21,23 +21,25 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(origin: Vec3,
-               view_point: Vec3,
-               orthogonal_up: Vec3,
-               vertical_field_of_view: f64,
-               aspect_ratio: f64,
-               aperture: f64,
-               distance_to_focus: f64)
-               -> Camera {
+    pub fn new(
+        origin: Vec3,
+        view_point: Vec3,
+        orthogonal_up: Vec3,
+        vertical_field_of_view: f64,
+        aspect_ratio: f64,
+        aperture: f64,
+        distance_to_focus: f64,
+    ) -> Camera {
         let theta = vertical_field_of_view * PI / 180.0;
         let half_height = (theta / 2.0).tan();
         let half_width = aspect_ratio * half_height;
         let w = (origin - view_point).normalize();
         let u = (orthogonal_up.cross(w)).normalize();
         let v = w.cross(u);
-        let lower_left_corner = origin - half_width * distance_to_focus * u -
-                                half_height * distance_to_focus * v -
-                                distance_to_focus * w;
+        let lower_left_corner = origin
+            - half_width * distance_to_focus * u
+            - half_height * distance_to_focus * v
+            - distance_to_focus * w;
         let horizontal = 2.0 * half_width * distance_to_focus * u;
         let vertical = 2.0 * half_height * distance_to_focus * v;
         Camera {
@@ -60,29 +62,33 @@ impl Camera {
     pub fn create_ray(&self, u: f64, v: f64) -> Ray {
         let rd = self.lens_radius * random_point_in_unit_disc();
         let offset = self.u * rd.x + self.v * rd.y;
-        let direection = self.lower_left_corner + u * self.horizontal + v * self.vertical -
-                         self.origin - offset;
+        let direection =
+            self.lower_left_corner + u * self.horizontal + v * self.vertical - self.origin - offset;
         Ray::new(self.origin + offset, direection.normalize())
     }
 
     pub fn look_at(&self, at: Vec3) -> Camera {
-        Camera::new(self.origin,
-                    at,
-                    self.orthogonal_up,
-                    self.vertical_field_of_view,
-                    self.aspect_ratio,
-                    self.aperture,
-                    self.distance_to_focus)
+        Camera::new(
+            self.origin,
+            at,
+            self.orthogonal_up,
+            self.vertical_field_of_view,
+            self.aspect_ratio,
+            self.aperture,
+            self.distance_to_focus,
+        )
     }
 
     pub fn move_to(&self, origin: Vec3) -> Camera {
-        Camera::new(origin,
-                    self.view_point,
-                    self.orthogonal_up,
-                    self.vertical_field_of_view,
-                    self.aspect_ratio,
-                    self.aperture,
-                    self.distance_to_focus)
+        Camera::new(
+            origin,
+            self.view_point,
+            self.orthogonal_up,
+            self.vertical_field_of_view,
+            self.aspect_ratio,
+            self.aperture,
+            self.distance_to_focus,
+        )
     }
 }
 

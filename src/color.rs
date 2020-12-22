@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul, Div};
+use std::ops::{Add, Div, Mul};
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Color {
