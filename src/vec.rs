@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Mul, Div, Index};
+use std::ops::{Add, Div, Index, Mul, Sub};
 
 use matrix::Matrix4;
 
@@ -93,14 +93,14 @@ impl Mul<Vec3> for Matrix4 {
     type Output = Vec3;
 
     fn mul(self, vec: Vec3) -> Vec3 {
-	     let m = self.m;
+        let m = self.m;
 
-         let x = vec[0] * m[0][0] + vec[1] * m[0][1] + vec[2] * m[0][2] + m[0][3];
-         let y = vec[0] * m[1][0] + vec[1] * m[1][1] + vec[2] * m[1][2] + m[1][3];
-         let z = vec[0] * m[2][0] + vec[1] * m[2][1] + vec[2] * m[2][2] + m[2][3];
-         let w = vec[0] * m[3][0] + vec[1] * m[3][1] + vec[2] * m[3][2] + m[3][3];
+        let x = vec[0] * m[0][0] + vec[1] * m[0][1] + vec[2] * m[0][2] + m[0][3];
+        let y = vec[0] * m[1][0] + vec[1] * m[1][1] + vec[2] * m[1][2] + m[1][3];
+        let z = vec[0] * m[2][0] + vec[1] * m[2][1] + vec[2] * m[2][2] + m[2][3];
+        let w = vec[0] * m[3][0] + vec[1] * m[3][1] + vec[2] * m[3][2] + m[3][3];
 
-         Vec3::new(x / w, y / w, z / w)
+        Vec3::new(x / w, y / w, z / w)
     }
 }
 

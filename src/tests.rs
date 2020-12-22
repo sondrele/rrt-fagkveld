@@ -35,7 +35,6 @@ mod step_1 {
         assert_that!(c.y, is(equal_to(2.0)));
         assert_that!(c.z, is(equal_to(4.0)));
     }
-
 }
 
 mod step_2 {
@@ -63,8 +62,10 @@ mod step_3 {
         let direction = Vec3::new(0.0, 1.0, 0.0);
         let ray = Ray::new(origin, direction);
 
-        assert_that!(ray.point_along_direction(4.0),
-                     is(equal_to(Vec3::new(1.0, 2.0, 0.0))));
+        assert_that!(
+            ray.point_along_direction(4.0),
+            is(equal_to(Vec3::new(1.0, 2.0, 0.0)))
+        );
     }
 
     #[test]

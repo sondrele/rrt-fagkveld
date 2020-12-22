@@ -8,21 +8,21 @@ pub trait Intersectable {
         None
     }
 
-    fn move_to(&self, vec: Vec3) -> Box<Intersectable>;
+    fn move_to(&self, vec: Vec3) -> Box<dyn Intersectable>;
 }
 
 pub struct Intersection {
     pub distance: f64,
     pub intersection_point: Vec3,
     pub normal: Vec3,
-    pub shape: Box<Intersectable>,
+    pub shape: Box<dyn Intersectable>,
 }
 
 impl Intersection {
     pub fn new(distance: f64,
                intersection_point: Vec3,
                normal: Vec3,
-               shape: Box<Intersectable>)
+               shape: Box<dyn Intersectable>)
                -> Intersection {
         Intersection {
             distance: distance,
@@ -34,11 +34,11 @@ impl Intersection {
 }
 
 pub struct Scene {
-    pub shapes: Vec<Box<Intersectable>>,
+    pub shapes: Vec<Box<dyn Intersectable>>,
 }
 
 impl Scene {
-    pub fn new(shapes: Vec<Box<Intersectable>>) -> Scene {
+    pub fn new(shapes: Vec<Box<dyn Intersectable>>) -> Scene {
         Scene { shapes: shapes }
     }
 }
@@ -60,7 +60,7 @@ impl Intersectable for Scene {
         intersection
     }
 
-    fn move_to(&self, _: Vec3) -> Box<Intersectable> {
+    fn move_to(&self, _: Vec3) -> Box<dyn Intersectable> {
         Box::new(Scene::new(vec![]))
     }
 }
@@ -149,7 +149,7 @@ impl Intersectable for Sphere {
         }
     }
 
-    fn move_to(&self, vec: Vec3) -> Box<Intersectable> {
+    fn move_to(&self, vec: Vec3) -> Box<dyn Intersectable> {
         Box::new(Sphere {
             origin: vec,
             radius: self.radius,

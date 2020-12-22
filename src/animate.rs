@@ -1,7 +1,7 @@
-use vec::Vec3;
-use scene::{ Scene, Sphere };
 use camera::Camera;
 use color::Color;
+use scene::{Scene, Sphere};
+use vec::Vec3;
 
 #[derive(Clone, Debug)]
 pub struct Keyframe {
@@ -16,7 +16,7 @@ impl Keyframe {
         t: usize,
         camera_position: Vec3,
         camera_look_at: Vec3,
-        positions: Vec<Vec3>
+        positions: Vec<Vec3>,
     ) -> Keyframe {
         Keyframe {
             t: t,
@@ -33,13 +33,12 @@ pub struct Keyframes {
 }
 
 impl Keyframes {
-
     pub fn new(frames: Vec<Keyframe>) -> Keyframes {
         Keyframes { frames: frames }
     }
 
     fn get_or_last(&self, i: usize) -> Keyframe {
-        let last = self.frames.len()-1;
+        let last = self.frames.len() - 1;
 
         if i < last {
             self.frames[i].clone()
@@ -53,7 +52,7 @@ impl Keyframes {
             let next = self.get_or_last(i);
 
             if next.t > t {
-                let prev = self.get_or_last(i-1);
+                let prev = self.get_or_last(i - 1);
 
                 let p = (t - prev.t) as f64 / (next.t - prev.t) as f64;
 
@@ -73,7 +72,7 @@ impl Keyframes {
             let next = self.get_or_last(i);
 
             if next.t > t {
-                let prev = self.get_or_last(i-1);
+                let prev = self.get_or_last(i - 1);
 
                 let p = (t - prev.t) as f64 / (next.t - prev.t) as f64;
 
@@ -93,7 +92,7 @@ impl Keyframes {
             let next = self.get_or_last(i);
 
             if next.t > t {
-                let prev = self.get_or_last(i-1);
+                let prev = self.get_or_last(i - 1);
 
                 let p = (t - prev.t) as f64 / (next.t - prev.t) as f64;
 
@@ -114,5 +113,8 @@ pub fn animate(scene: &Scene, camera: &Camera, frames: &Keyframes, t: usize) -> 
     for s in 0..scene.shapes.len() {
         shapes.push(scene.shapes[s].move_to(frames.pos(t, s)));
     }
-    (Scene::new(shapes), camera.look_at(frames.look(t)).move_to(frames.cam(t)))
+    (
+        Scene::new(shapes),
+        camera.look_at(frames.look(t)).move_to(frames.cam(t)),
+    )
 }
